@@ -11,7 +11,8 @@ class ASSE_Prometheus {
 
   protected $rewrite_rule       = 'metrics/?$';
   protected $prefix             = 'wp';
-  protected $query_var          = 'wpe_metrics';
+  protected $query_var          = 'metrics';
+  protected $url                = '/metrics';
 
   protected $metrics  = array();
 
@@ -28,6 +29,7 @@ class ASSE_Prometheus {
     $this->metrics['plugins_active_sum']   = $this->registry->getOrRegisterGauge( $this->prefix, 'plugins_active_sum', 'it sets' );
 
     add_filter( 'query_vars', array( &$this, 'add_query_vars' ) );
+    add_filter( 'redirect_canonical', array( &$this, 'prevent_redirect_canonical' ) );
 
     add_action( 'init', array( &$this, 'rewrites_init' ) );
     add_action( 'template_redirect', array( &$this, 'send_metrics' ) );
@@ -56,7 +58,7 @@ class ASSE_Prometheus {
   public function set_metrics() {
     $this->metrics['user_sum']->set( count_users()['total_users'] );
     $this->metrics['plugins_active_sum']->set( count( get_option('active_plugins') ) );
-  
+
     return true;
   }
 
@@ -75,6 +77,10 @@ class ASSE_Prometheus {
     @header( 'Content-type: ' . RenderTextFormat::MIME_TYPE );
     echo $result;
     exit;
+  }
+
+  public function prevent_redirect_canonical( $redirect_url ) {
+    return !! strpos( $redirect_url, $this->url );
   }
 
 }

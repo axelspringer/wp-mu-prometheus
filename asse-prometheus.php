@@ -51,15 +51,18 @@ class ASSE_Prometheus {
   public function set_metrics() {
     $this->metrics['user_sum']->set( count_users()['total_users'] );
     $this->metrics['plugins_active_sum']->set( count( get_option('active_plugins') ) );
+  
+    return true;
   }
 
   public function send_metrics() {
 
     $wpe_metrics = get_query_var( $this->query_var, false );
-    if ( $wpe_metrics !== true ) {
+    if ( $wpe_metrics != true ) {
       return;
     }
 
+    $this->set_metrics() || exit;
     $result = $this->renderer->render($this->registry->getMetricFamilySamples());
 
     header_remove();

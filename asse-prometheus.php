@@ -13,8 +13,11 @@ class ASSE_Prometheus {
   protected $prefix             = 'wp';
   protected $query_var          = 'metrics';
   protected $url                = '/metrics';
+  protected $wp_layer           = null;
+  protected $wp_project         = null;
 
   protected $metrics  = array();
+  protected $labels   = array();
 
   private $renderer   = null;
   private $registry   = null;
@@ -25,8 +28,13 @@ class ASSE_Prometheus {
     $this->registry   = new CollectorRegistry($this->adapter);
     $this->renderer   = new RenderTextFormat();
 
-    $this->metrics['user_sum']             = $this->registry->getOrRegisterGauge( $this->prefix, 'user_sum', 'it sets' );
-    $this->metrics['plugins_active_sum']   = $this->registry->getOrRegisterGauge( $this->prefix, 'plugins_active_sum', 'it sets' );
+    $this->labels = array(
+      'layer'     => strtolower( getenv( 'WP_LAYER' ) ),
+      'project'   => strtolower( getenv( 'PROJECT' ) )
+    );
+
+    $this->metrics['user_sum']             = $this->registry->getOrRegisterGauge( $this->prefix, 'user_sum', 'it sets', array_keys( $this->labels ) );
+    $this->metrics['plugins_active_sum']   = $this->registry->getOrRegisterGauge( $this->prefix, 'plugins_active_sum', 'it sets', array_keys( $this->labels ) );
 
     add_filter( 'query_vars', array( &$this, 'add_query_vars' ) );
     add_filter( 'redirect_canonical', array( &$this, 'prevent_redirect_canonical' ) );
@@ -56,8 +64,8 @@ class ASSE_Prometheus {
   }
 
   public function set_metrics() {
-    $this->metrics['user_sum']->set( count_users()['total_users'] );
-    $this->metrics['plugins_active_sum']->set( count( get_option('active_plugins') ) );
+    $this->metrics['user_sum']->set( count_users()['total_users'], array_values( $this->labels ) );
+    $this->metrics['plugins_active_sum']->set( count( get_option('active_plugins') ), array_values( $this->labels ) );
 
     return true;
   }

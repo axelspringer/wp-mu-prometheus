@@ -9,8 +9,7 @@ use Prometheus\Storage;
 
 class ASSE_Prometheus {
 
-  protected $endpoint_regex     = '^metrics/?';
-  protected $endpoint_url       = 'metrics';
+  protected $rewrite_rule       = 'metrics/?$';
   protected $prefix             = 'wp';
   protected $query_var          = 'wpe_metrics';
 
@@ -28,7 +27,7 @@ class ASSE_Prometheus {
     $this->metrics['user_sum']             = $this->registry->getOrRegisterGauge( $this->prefix, 'user_sum', 'it sets' );
     $this->metrics['plugins_active_sum']   = $this->registry->getOrRegisterGauge( $this->prefix, 'plugins_active_sum', 'it sets' );
 
-    add_filter( 'query_vars', array( &$this, 'add_query_vars' ), 0 );
+    add_filter( 'query_vars', array( &$this, 'add_query_vars' ) );
 
     add_action( 'init', array( &$this, 'rewrites_init' ) );
     add_action( 'template_redirect', array( &$this, 'send_metrics' ) );
@@ -37,14 +36,23 @@ class ASSE_Prometheus {
 
   public function rewrites_init() {
     add_rewrite_rule(
-      $this->endpoint_regex,
+      $this->rewrite_rule,
       'index.php?' . $this->query_var . '=true',
       'top'
     );
+
+    $rules  = get_option( 'rewrite_rules' );
+    if ( ! isset( $rules[$this->rewrite_rule] ) ) {
+        global $wp_rewrite;
+        $wp_rewrite->flush_rules();
+    }
   }
 
   public function add_query_vars( $vars ) {
     $vars[] = $this->query_var;
+    print_r($vars);
+
+    wp_die();
     return $vars;
   }
 

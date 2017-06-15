@@ -54,7 +54,11 @@ class ASSE_Prometheus {
   }
 
   public function send_metrics() {
-    $this->set_metrics();
+
+    $wpe_metrics = get_query_var( $this->query_var, false );
+    if ( $wpe_metrics !== true ) {
+      return;
+    }
 
     $result = $this->renderer->render($this->registry->getMetricFamilySamples());
 

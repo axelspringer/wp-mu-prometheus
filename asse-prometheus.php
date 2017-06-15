@@ -50,9 +50,6 @@ class ASSE_Prometheus {
 
   public function add_query_vars( $vars ) {
     $vars[] = $this->query_var;
-    print_r($vars);
-
-    wp_die();
     return $vars;
   }
 

@@ -75,8 +75,18 @@ class ASSE_Prometheus {
     $this->metrics['articles_publish_sum']->set( $count_posts->publish, array_values( $this->labels ) );
     $this->metrics['articles_draft_sum']->set( $count_posts->draft, array_values( $this->labels ) );
 
+    wp_die(wp_count_attachments( get_allowed_mime_types() ));
+
     $count_attachments = wp_count_attachments();
     $this->metrics['attachments_sum']->set( $count_posts->draft, array_values( $this->labels ) );
+
+    $result = wp_cache_get( 'test' );
+    if ( false === $result ) {
+	    $result = 1;
+	    wp_cache_set( 'test', $result );
+    }
+
+    wp_die($result);
 
     return true;
   }
@@ -89,7 +99,7 @@ class ASSE_Prometheus {
     }
 
     $this->set_metrics() || exit;
-    $result = $this->renderer->render($this->registry->getMetricFamilySamples());
+    $result = $this->renderer->render( $this->registry->getMetricFamilySamples() );
 
     header_remove();
 

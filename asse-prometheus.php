@@ -91,6 +91,7 @@ class ASSE_Prometheus {
 
     foreach ( $this->wp_hooks as $wp_hook ) {
       $this->metrics[$wp_hook . '_count']->incBy( wp_cache_get( $wp_hook, $this->cache_group) || 0, array_values( $this->labels ) );
+      wp_cache_delete( $wp_hook, $this->cache_group );
     }
 
     return true;

@@ -30,11 +30,15 @@ class ASSE_Prometheus {
 
     $this->labels = array(
       'layer'     => strtolower( getenv( 'WP_LAYER' ) ),
-      'project'   => strtolower( getenv( 'PROJECT' ) )
+      'project'   => strtolower( getenv( 'PROJECT' ) ),
+      'env'       => strtolower( getenv( 'ENVIRONMENT' ) )
     );
 
-    $this->metrics['user_sum']             = $this->registry->getOrRegisterGauge( $this->prefix, 'user_sum', 'it sets', array_keys( $this->labels ) );
-    $this->metrics['plugins_active_sum']   = $this->registry->getOrRegisterGauge( $this->prefix, 'plugins_active_sum', 'it sets', array_keys( $this->labels ) );
+    $this->metrics['user_sum']              = $this->registry->getOrRegisterGauge( $this->prefix, 'user_sum', 'it sets', array_keys( $this->labels ) );
+    $this->metrics['plugins_active_sum']    = $this->registry->getOrRegisterGauge( $this->prefix, 'plugins_active_sum', 'it sets', array_keys( $this->labels ) );
+    $this->metrics['articles_publish_sum']  = $this->registry->getOrRegisterGauge( $this->prefix, 'articles_publish_sum', 'it sets', array_keys( $this->labels ) );
+    $this->metrics['articles_draft_sum']    = $this->registry->getOrRegisterGauge( $this->prefix, 'articles_draft_sum', 'it sets', array_keys( $this->labels ) );
+    $this->metrics['attachments_sum']       = $this->registry->getOrRegisterGauge( $this->prefix, 'attachments_sum', 'it sets', array_keys( $this->labels ) );
 
     add_filter( 'query_vars', array( &$this, 'add_query_vars' ) );
     add_filter( 'redirect_canonical', array( &$this, 'prevent_redirect_canonical' ) );
@@ -66,6 +70,13 @@ class ASSE_Prometheus {
   public function set_metrics() {
     $this->metrics['user_sum']->set( count_users()['total_users'], array_values( $this->labels ) );
     $this->metrics['plugins_active_sum']->set( count( get_option('active_plugins') ), array_values( $this->labels ) );
+
+    $count_posts = wp_count_posts();
+    $this->metrics['articles_publish_sum']->set( $count_posts->publish, array_values( $this->labels ) );
+    $this->metrics['articles_draft_sum']->set( $count_posts->draft, array_values( $this->labels ) );
+
+    $count_attachments = wp_count_attachments();
+    $this->metrics['attachments_sum']->set( $count_posts->draft, array_values( $this->labels ) );
 
     return true;
   }

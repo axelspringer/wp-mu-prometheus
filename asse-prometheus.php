@@ -123,7 +123,7 @@ class AssePrometheus {
 
   public function inject_hooks() {
     foreach ( $this->wp_hooks as $wp_hook ) {
-      add_action( $wp_hook, ASSE_Prometheus::hook_func( $wp_hook, $this->cache_group, $this->cache_expire ) );
+      add_action( $wp_hook, AssePrometheus::hook_func( $wp_hook, $this->cache_group, $this->cache_expire ) );
     }
   }
 

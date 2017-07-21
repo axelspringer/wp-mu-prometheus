@@ -7,7 +7,7 @@ use Prometheus\RenderTextFormat;
 use Prometheus\CollectorRegistry;
 use Prometheus\Storage;
 
-class ASSE_Prometheus {
+class AssePrometheus {
 
   protected $rewrite_rule       = 'metrics/?$';
   protected $prefix             = 'wp';
@@ -115,7 +115,10 @@ class ASSE_Prometheus {
   }
 
   public function prevent_redirect_canonical( $redirect_url ) {
-    return !! strpos( $redirect_url, $this->url );
+    if ( strpos( $redirect_url, $this->url ) ) {
+      return false;
+    }
+    return $redirect_url;
   }
 
   public function inject_hooks() {
@@ -135,4 +138,4 @@ class ASSE_Prometheus {
 
 }
 
-$asse_prometheus = new ASSE_Prometheus();
+$asse_prometheus = new AssePrometheus();

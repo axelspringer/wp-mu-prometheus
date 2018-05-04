@@ -1,5 +1,5 @@
 {
-    "name": "muplugin/asse-prometheus",
+    "name": "axelspringer/wp-mu-prometheus",
     "type": "wordpress-muplugin",
     "description": "Prometheus Wordpress Metrics",
     "keywords": [
@@ -8,16 +8,16 @@
     ],
     "authors": [
         {
-            "name": "Developer",
+            "name": "Mathias Witt",
             "homepage": "http://www.axelspringer.de"
         }
     ],
     "require": {
         "jimdo/prometheus_client_php": "^0.9.0"
     },
-    "homepage": "https://as-stash.axelspringer.de/projects/WPMUP/repos/asse-action-post/browse",
-    "license": "proprietary",
+    "homepage": "https://github.com/axelspringer//wp-mu-prometheus",
+    "license": "Apache-2.0",
     "extra": {
-        "installer-name": "asse-prometheus"
+        "installer-name": "wp-mu-prometheus"
     }
 }
